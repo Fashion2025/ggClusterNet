@@ -47,7 +47,7 @@ network.pip = function(
     ps = NULL,
     N = 0,
     ra = NULL,
-    order,
+    order = NULL ,
     big = TRUE,
     select_layout = FALSE,
     layout_net = "model_maptree2",
@@ -165,10 +165,25 @@ network.pip = function(
       edge = rbind(edg,edge)
     }
   }
-  # head(edge)
+  head(edge)
 
-  tax = ps %>% vegan_tax() %>% as.data.frame() %>%
+  # tax = ps %>% vegan_tax() %>% as.data.frame() %>%
+  #   rownames_to_column("ID")
+  tax <- ps %>%
+    vegan_tax() %>%
+    as.data.frame() %>%
+    {
+      if ("ID" %in% colnames(.)) {
+        rename(., ID0 = ID)
+      } else {
+        .
+      }
+    } %>%
     rownames_to_column("ID")
+
+
+
+
   node$ID = node$elements
   node.1 = node  %>%
     dplyr::left_join(tax,by = "ID")
@@ -190,7 +205,8 @@ network.pip = function(
   id = edge$group %>% unique()
   aa = c()
   for (i in 1:length(id)) {
-    aa[i] = edge %>% filter(group == id[i]) %>%
+    aa[i] = edge %>%
+      dplyr::filter(group == id[i]) %>%
       dplyr::select("OTU_2", "OTU_1") %>% as.matrix() %>%
       as.vector() %>% unique() %>% length()
   }
@@ -198,13 +214,18 @@ network.pip = function(
 
   tem3 = tem2# %>% full_join(tem2,by = "group")
   tem3$label= paste(tem3$group,": (nodes: ",
-                    tem3$nodes,"; links: ",tem3$links,")",sep = "")
+                    tem3$nodes,"; links: ",tem$links,")",sep = "")
 
 
-
-
+if ( is.null(order) ) {
+  node.1$group = factor(node.1$group)
+  edge$group = factor(edge$group)
+} else{
   node.1$group = factor(node.1$group,levels = order)
   edge$group = factor(edge$group,levels = order)
+}
+
+
   # tem3 = tem3[match(a,tem3$order),]
   tem3$label = factor(tem3$label,levels = tem3$label)
   edge = edge %>% left_join(tem3,by = "group")

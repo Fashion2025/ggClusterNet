@@ -101,6 +101,7 @@ filter_OTU_ps <- function(ps = ps,Top = NULL
 
 filter_OTU_ps2 <- function(ps = ps,filter = NULL
 ){
+  otu_table2 = as.data.frame(t(vegan_otu(ps)))
   if (!is.null(filter)&filter != 0& filter > 1) {
     ps_rela  = phyloseq::transform_sample_counts(ps, function(x) x / sum(x) )
     # otu table
@@ -110,7 +111,7 @@ filter_OTU_ps2 <- function(ps = ps,filter = NULL
 
     otu_table<- dplyr::arrange(otu_table, desc(mean))
     subtab = head(otu_table,filter)
-    otu_table2 = as.data.frame(t(vegan_otu(ps)))
+
     phyloseq::otu_table(ps) = phyloseq::otu_table(as.matrix(otu_table2[subtab$ID,]),taxa_are_rows = TRUE)
   } else if(filter == 0){
     ps = ps
@@ -1392,4 +1393,15 @@ merge.ps <- function(ps1 ,
 }
 
 
+select_character = function(x,sep = "_",select = 1){
+  y = x  %>% strsplit(sep) %>%  sapply(`[`, select)
+  if (select == "last") {
+    y = x %>% strsplit(sep) %>% sapply(function(x) x[length(x)])
+  }
+
+  if (select < 0) {
+    y = x %>% strsplit(sep) %>% sapply(function(x) x[length(x) + select])
+  }
+  return(y)
+}
 

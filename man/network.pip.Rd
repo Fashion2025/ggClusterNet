@@ -11,7 +11,7 @@ network.pip(
   ps = NULL,
   N = 0,
   ra = NULL,
-  order,
+  order = NULL,
   big = TRUE,
   select_layout = FALSE,
   layout_net = "model_maptree2",
