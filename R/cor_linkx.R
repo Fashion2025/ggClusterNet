@@ -14,6 +14,7 @@ cor_linkx <-function(data,
          numpoint2 = 21,
          curvature = 0.2,
          p.thur = 0.3,
+         sig = FALSE,
          onlysig = TRUE
 ){
 
